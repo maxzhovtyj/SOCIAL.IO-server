@@ -40,17 +40,17 @@ class authController {
             const {username, password} = req.body
             const user = await User.findOne({username})
             if (!user) {
-                return res.status(400).json({message: `user with name ${username} was not found`})
+                return res.status(400).json({message: `User has not been found...`})
             }
             const validPassword = bcrypt.compareSync(password, user.password)
             if (!validPassword) {
-                return res.status(400).json({message: "Wrong password, try again"})
+                return res.status(400).json({message: "Wrong password, try again..."})
             }
             const token = generateAccessToken(user._id, user.roles)
             return res.json({token})
 
         } catch (e) {
-            return res.status(400).json('Something went wrong (login)')
+            return res.status(400).json('Something went wrong (login)...')
         }
     }
 
