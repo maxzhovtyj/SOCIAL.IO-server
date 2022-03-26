@@ -13,6 +13,8 @@ router.post('/registration', [
     check('password', "Password must be longer that 4 characters").isLength({min: 4})
 ], controller.registration)
 router.post('/login', controller.login)
+router.post('/newPost', controller.addNewPost)
+router.get('/userPosts', controller.getUserPosts)
 router.get('/users', roleMiddleware(['USER', 'ADMIN']), controller.getUsers)
 
 module.exports = router

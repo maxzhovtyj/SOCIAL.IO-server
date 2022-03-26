@@ -54,12 +54,41 @@ class authController {
         }
     }
 
+    async addNewPost(req, res) {
+        try {
+            const {username, post} = req.body
+            const user = await User.findOne({username})
+            if (!user) {
+                return res.status(400).json({message: "User has not been found..."})
+            }
+            console.log(post)
+            user.posts.push(post)
+            user.save()
+            return res.json('Post has been saved')
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    async getUserPosts(req, res) {
+        try {
+            const {username} = req.body
+            const user = await User.findOne({username})
+            if (!user) {
+                return res.status(400).json({message: "User has not been found..."})
+            }
+            res.json(user.posts)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     async getUsers(req, res) {
         try {
             const users = await User.find()
             res.json(users)
         } catch (e) {
-
+            console.log(e)
         }
     }
 }
