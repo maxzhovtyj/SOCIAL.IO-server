@@ -1,5 +1,6 @@
 const User = require('./models/User')
 const Role = require('./models/Role')
+const Post = require('./models/Post')
 
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -26,7 +27,7 @@ class authController {
             }
             const hashPassword = bcrypt.hashSync(password, 7)
             const userRole = await Role.findOne({value: "USER"})
-            const user = new User({username, password: hashPassword, roles: [userRole.value]})
+            const user = new User({username, password: hashPassword, userInfo: {nameSurname: username}, roles: [userRole.value]})
             await user.save()
             return res.json({message: "User has been successfully registered"})
         } catch (e) {
@@ -47,8 +48,7 @@ class authController {
                 return res.status(400).json({message: "Wrong password, try again..."})
             }
             const token = generateAccessToken(user._id, user.roles)
-            return res.json({token})
-
+            return res.json({token, userId: user._id})
         } catch (e) {
             return res.status(400).json('Something went wrong (login)...')
         }
@@ -56,14 +56,21 @@ class authController {
 
     async addNewPost(req, res) {
         try {
-            const {username, post} = req.body
-            const user = await User.findOne({username})
+            const post = req.body
+            const user = await User.findById(post.authorId)
+            console.log(user)
             if (!user) {
                 return res.status(400).json({message: "User has not been found..."})
             }
-            console.log(post)
-            user.posts.push(post)
-            user.save()
+            const newPost = new Post({
+                authorId: post.authorId,
+                authorName: user.userInfo.nameSurname,
+                text: post.text
+            })
+            await newPost.save()
+
+            await user.posts.push(newPost)
+            await user.save()
             return res.json('Post has been saved')
         } catch (e) {
             console.log(e)
@@ -72,14 +79,39 @@ class authController {
 
     async getUserPosts(req, res) {
         try {
-            const {username} = req.body
-            const user = await User.findOne({username})
+            const params = req.query
+            const user = await User.findById(params.id)
             if (!user) {
                 return res.status(400).json({message: "User has not been found..."})
             }
-            res.json(user.posts)
+            return res.json(user.posts)
         } catch (e) {
             console.log(e)
+            return res.status(400).json({message: "Something went wrong"})
+        }
+    }
+
+    async getAllPosts(req, res) {
+        try {
+            const posts = await Post.find()
+            res.json(posts)
+        } catch (e) {
+            console.log(e)
+            return res.status(400).json({message: 'Something went wrong'})
+        }
+    }
+
+    async getUserInfo(req, res) {
+        try {
+            const params = req.query
+            const user = await User.findById(params.id)
+            if (!user) {
+                return res.status(400).json({message: "User has not been found..."})
+            }
+            return res.json(user)
+        } catch (e) {
+            console.log(e)
+            return res.status(400).json({message: "Something went wrong"})
         }
     }
 
