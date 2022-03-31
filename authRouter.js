@@ -16,7 +16,6 @@ router.post('/login', controller.login)
 router.post('/newPost', controller.addNewPost)
 router.get('/userPosts', controller.getUserPosts)
 router.get('/posts', controller.getAllPosts)
-router.get('/userInfo', controller.getUserInfo)
-router.get('/users', roleMiddleware(['USER', 'ADMIN']), controller.getUsers)
+// router.get('/users', roleMiddleware(['USER', 'ADMIN']), controller.getUsers)
 
 module.exports = router

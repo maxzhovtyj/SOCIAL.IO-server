@@ -27,7 +27,10 @@ class authController {
             }
             const hashPassword = bcrypt.hashSync(password, 7)
             const userRole = await Role.findOne({value: "USER"})
-            const user = new User({username, password: hashPassword, userInfo: {nameSurname: username}, roles: [userRole.value]})
+            const user = new User({username, password: hashPassword, friends: [], userInfo: {nameSurname: username}, roles: [userRole.value]})
+            await user.save()
+
+            user.userInfo.userId = await user._id
             await user.save()
             return res.json({message: "User has been successfully registered"})
         } catch (e) {
@@ -98,29 +101,6 @@ class authController {
         } catch (e) {
             console.log(e)
             return res.status(400).json({message: 'Something went wrong'})
-        }
-    }
-
-    async getUserInfo(req, res) {
-        try {
-            const params = req.query
-            const user = await User.findById(params.id)
-            if (!user) {
-                return res.status(400).json({message: "User has not been found..."})
-            }
-            return res.json(user)
-        } catch (e) {
-            console.log(e)
-            return res.status(400).json({message: "Something went wrong"})
-        }
-    }
-
-    async getUsers(req, res) {
-        try {
-            const users = await User.find()
-            res.json(users)
-        } catch (e) {
-            console.log(e)
         }
     }
 }

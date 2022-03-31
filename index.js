@@ -1,9 +1,9 @@
-// todo
-
 const express = require('express')
 const mongoose = require('mongoose')
-const authRouter = require('./authRouter')
 const cors = require("cors");
+
+const authRouter = require('./authRouter')
+const apiRouter = require('./apiRouter')
 
 const app = express()
 
@@ -15,6 +15,7 @@ app.use(cors({
     origin: 'http://localhost:3000'
 }))
 app.use('/auth', authRouter)
+app.use('/api', apiRouter)
 
 const start = async () => {
     try {
